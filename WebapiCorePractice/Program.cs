@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using WebapiCorePractice.Data;
 using WebapiCorePractice.Helper;
 using WebapiCorePractice.Models;
+using WebapiCorePractice.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<TodoContext>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer")));
-//builder.Services.AddSingleton<ITypeConvert>();
+builder.Services.AddScoped<GetService>();
 
 var app = builder.Build();
 

@@ -6,6 +6,7 @@ using WebapiCorePractice.DTO;
 using WebapiCorePractice.DTOs;
 using WebapiCorePractice.Helper;
 using WebapiCorePractice.Models;
+using WebapiCorePractice.Services;
 
 namespace WebapiCorePractice.Controllers
 {
@@ -14,16 +15,12 @@ namespace WebapiCorePractice.Controllers
     public class DbTestController : Controller
     {
         private readonly TodoContext _todoContext;
+        private readonly GetService _getService;
 
-        //private readonly ITypeConvert _typeConvert;
-
-        public DbTestController(
-            TodoContext todoContext
-            //, ITypeConvert typeConvert
-            )
+        public DbTestController(TodoContext todoContext, GetService getService)
         {
             _todoContext = todoContext;
-            //_typeConvert = typeConvert;
+            _getService = getService;
         }
 
         [HttpGet()]
@@ -50,21 +47,15 @@ namespace WebapiCorePractice.Controllers
         /// <param name="value"></param>
         /// <returns></returns>
         [HttpPost("GetAll")]
-        public ActionResult<Player> GetAll([FromBody] Player value)
+        public IEnumerable<object> GetAll([FromBody] JsonBody value)
         {
-            if (value is null)
-            {
-                throw new ArgumentNullException(nameof(value));
-            }
-
             if (_todoContext.Players is null)
             {
-                return NotFound();
+                return null;
             }
 
-            var collection = _todoContext.Players.ToArray();
 
-            return Ok(collection);
+            return _getService.GetAllData(value);
         }
 
         /// <summary>
@@ -76,14 +67,8 @@ namespace WebapiCorePractice.Controllers
         [HttpPost("GetTarget/{typeName}")]
         public ActionResult<object> GetTarget([FromRoute] string typeName, [FromBody] JsonBody value)
         {
-            //_typeConvert.Convert(typeName);
-
-            var json = JsonConvert.DeserializeObject<Player>(value.Json.ToString());
-            var collection = _todoContext.Players.ToArray();
-
-            var element = collection.Where(x => x.Id == json.Id).First();
-
-            return element;
+            
+            return _getService.GetSingleData(value);
         }
 
         /// <summary>
